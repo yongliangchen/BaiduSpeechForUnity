@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="com.hiscene.baiduspeech">
+    
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- 这个android:label设置后，unity中ProductName就不生效了，记得改这个-->
+    <application android:label="BaiduSpeech">
+        
+        <meta-data android:name="com.baidu.speech.APP_ID"
+        android:value="21554025" />
+        <meta-data
+        android:name="com.baidu.speech.API_KEY"
+        android:value="oihuTZ4kIwWctUmnnTIj39YA" />
+        <meta-data
+        android:name="com.baidu.speech.SECRET_KEY"
+        android:value="wMCLOlTWSrzPbHz9cyWEZnpTGfoV78Yd" />
+
+        <!-- 这个android:name的值必须为包名+类名-->
+        <activity android:name="com.hiscene.baiduspeech.MainActivity">
+             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+ 
+            <!-- 这一行不能少，否则会闪退-->
+             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+         </activity>
+     </application>
+
+</manifest>
