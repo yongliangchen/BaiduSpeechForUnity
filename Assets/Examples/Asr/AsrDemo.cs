@@ -31,8 +31,8 @@ namespace BaiduSpeech.Examples
         /// <summary>开始说话</summary>
         public void VoiceStart()
         {
-            //string data = "{\"accept-audio-data\":false,\"disable-punctuation\":false,\"accept-audio-volume\":true,\"vad.endpoint-timeout\":0,\"pid\":1537}";
-            string data = "{\"accept-audio-data\":false,\"disable-punctuation\":false,\"accept-audio-volume\":true,\"pid\":1537}";
+            string data = "{\"accept-audio-data\":false,\"disable-punctuation\":false,\"accept-audio-volume\":true,\"vad.endpoint-timeout\":0,\"pid\":1537}";
+            //string data = "{\"accept-audio-data\":false,\"disable-punctuation\":false,\"accept-audio-volume\":true,\"pid\":1537}";
             m_BaiduSpeechManager.VoiceStart(data);
 
             content.text = null;

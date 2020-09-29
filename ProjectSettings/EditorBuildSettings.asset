@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Examples/Main/Main.unity
+    guid: b8847fc4a07304ef79d45065224d6da2
+  - enabled: 1
     path: Assets/Examples/Wakeup/WakeupDemo.unity
     guid: 1f1c991c344f041029b756061a931235
   - enabled: 1
-    path: Assets/Examples/Asr/Asr.unity
+    path: Assets/Examples/Asr/AsrDemo.unity
     guid: 4dc4284b5b18e4c8a9a58dfd81242aac
   m_configObjects: {}
