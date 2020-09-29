@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace BaiduSpeech
 {
-    /// <summary>iOS平台百度语音管理</summary>
-    public class SpeechForiOS : SpeechBase
+    /// <summary>文本转语音基类</summary>
+    public abstract class TtsBase : SpeechBase
     {
 
     }

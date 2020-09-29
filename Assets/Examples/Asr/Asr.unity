@@ -258,7 +258,7 @@ GameObject:
   - component: {fileID: 146437412}
   - component: {fileID: 146437411}
   m_Layer: 0
-  m_Name: SpeechDemo
+  m_Name: AsrDemo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

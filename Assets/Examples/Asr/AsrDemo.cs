@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 namespace BaiduSpeech.Examples
 {
-    /// <summary>测试语音功能</summary>
-    public class SpeechDemo : MonoBehaviour
+    /// <summary>测试语音转文本功能</summary>
+    public class AsrDemo : MonoBehaviour
     {
         public Text content;
         public Slider volumeSlider;
@@ -19,7 +19,7 @@ namespace BaiduSpeech.Examples
             stateText.text = "初始化语音识别!";
 
             m_BaiduSpeechManager = FindObjectOfType<BaiduSpeechManager>();
-            m_BaiduSpeechManager.SpeechInit();//初始化语音识别
+            m_BaiduSpeechManager.AsrInit();//初始化语音识别
             m_BaiduSpeechManager.onSpeechEvent += OnSpeechEvent;
         }
 

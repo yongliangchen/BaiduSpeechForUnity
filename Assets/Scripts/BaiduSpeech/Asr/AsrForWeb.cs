@@ -6,8 +6,8 @@ using UnityEngine.Networking;
 
 namespace BaiduSpeech
 {
-    /// <summary>其他平台百度语音管理</summary>
-    public class SpeechForOther : SpeechBase
+    /// <summary>Web接口语音转文本功能API管理</summary>
+    public class AsrForWeb : AsrBase
     {
         private BaiduSpeechManager m_BaiduSpeechManager;
 
@@ -32,7 +32,7 @@ namespace BaiduSpeech
         private AudioClip saveAudioClip;
 
         //初始化平台
-        public override void InitPlatform()
+        public override void OnInitPlatform()
         {
             //获取麦克风设备，判断是否有麦克风设备
             if (Microphone.devices.Length > 0)
@@ -44,10 +44,8 @@ namespace BaiduSpeech
             m_BaiduSpeechManager = FindObjectOfType<BaiduSpeechManager>();
         }
 
-        //----------------------------------------语音识别----------------------------------------
-
         /// <summary>初始化语音</summary>
-        public override void SpeechInit()
+        public override void AsrInit()
         {
             if (isHaveMic == false || Microphone.IsRecording(currentDeviceName))
             {
@@ -110,10 +108,7 @@ namespace BaiduSpeech
         /// <summary>停止录音</summary>
         public override void VoiceStop()
         {
-            if (isHaveMic == false || !Microphone.IsRecording(currentDeviceName))
-            {
-                return;
-            }
+            if (isHaveMic == false || !Microphone.IsRecording(currentDeviceName)) { return; }
 
             Microphone.End(currentDeviceName);
             trueLength = Mathf.CeilToInt((float)(GetTimestampOfNowWithMillisecond() - lastPressTimestamp) / 1000f);
@@ -202,37 +197,8 @@ namespace BaiduSpeech
             if (string.IsNullOrEmpty(unityWebRequest.error))
             {
                 asrResult = unityWebRequest.downloadHandler.text;
-
-                //OriginResult originResult = JsonUtility.FromJson<OriginResult>(asrResult);
-                //CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
-                //callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL;
-                //SpeechParams speechParams = new SpeechParams();
-                //speechParams.results_recognition = originResult.result.word;
-                //if(originResult.result.word!=null&&originResult.result.word.Length>0) speechParams.best_result = originResult.result.word[0];
-                //speechParams.error = originResult.err_no;
-                //speechParams.origin_result = originResult;
-                //callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
-                //OnWebSpeechCallback(callbackMessage);
-
                 Debug.Log(asrResult);
             }
-        }
-
-        //----------------------------------------唤醒词----------------------------------------
-
-        /// <summary>初始化唤醒词</summary>
-        public override void WakeupInit()
-        {
-
-        }
-
-        /// <summary>
-        /// 开始唤醒词功能
-        /// </summary>
-        /// <param name="wakeUpPath">唤醒词库路径</param>
-        public override void WakeupStart(string wakeUpPath)
-        {
-
         }
 
         /// <summary>语音识别回调</summary>

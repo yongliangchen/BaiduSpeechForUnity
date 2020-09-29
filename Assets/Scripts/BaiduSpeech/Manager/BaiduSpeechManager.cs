@@ -12,66 +12,124 @@ namespace BaiduSpeech
 
         /// <summary>语音识别事件，参数1表示状态，参数2表示识别结果</summary>
         public event Action<CallbackMessageInfo> onSpeechEvent = null;
-        /// <summary>唤醒词事件，参数1表示状态，参数2表示识别结果</summary>
-        //public event Action<CallbackMessageInfo> onWakeupEvent = null;
-        private SpeechBase m_SpeechBase;
+        /// <summary>语音转文本</summary>
+        private AsrBase m_Asr;
+        /// <summary>唤醒词</summary>
+        private WakeupBase m_Wakeup;
+        /// <summary>文本转语音</summary>
+        private TtsBase m_Tts;
+
+        /// <summary>百度语音管理Java类</summary>
+        public AndroidJavaObject baiduSpeechJavaObject { get; set; }
 
         private void Awake()
         {
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-         m_SpeechBase = gameObject.AddComponent<SpeechForAndroid>();
+
+            try
+            {
+                AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                baiduSpeechJavaObject = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                baiduSpeechJavaObject.Call("Init", baiduSpeechJavaObject, gameObject.name);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(GetType() + "/Awake()/ Exception:" + e);
+            }
+
+            m_Asr = gameObject.AddComponent<AsrForAndroid>();
+            m_Wakeup = gameObject.AddComponent<WakeupForAndroid>();
+            m_Tts = gameObject.AddComponent<TtsForAndroid>();
+
 #else
 
 #if UNITY_IPHONE && !UNITY_EDITOR
-         m_SpeechBase = gameObject.AddComponent<SpeechForiOS>();
+
+            m_Asr = gameObject.AddComponent<AsrForiOS>();
+            m_Wakeup = gameObject.AddComponent<WakeupForiOS>();
+            m_Tts = gameObject.AddComponent<TtsForiOS>();
+
 #else
-         m_SpeechBase = gameObject.AddComponent<SpeechForOther>();
+
+            m_Asr = gameObject.AddComponent<AsrForWeb>();
+            m_Wakeup = gameObject.AddComponent<WakeupForWeb>();
+            m_Tts = gameObject.AddComponent<TtsForWeb>();
+
 #endif
 #endif
-            InitBaiduSpeechKey();
+
+            SetBaiduSpeechLicenese();
         }
 
-        private void InitBaiduSpeechKey()
+        private void OnDestroy()
         {
-            if (m_SpeechBase != null)
+            if (m_Asr != null) m_Asr.OnDispose();
+            if (m_Wakeup != null) m_Wakeup.OnDispose();
+            if (m_Tts != null) m_Tts.OnDispose();
+
+            if (baiduSpeechJavaObject != null)
             {
-                m_SpeechBase.appId = APP_ID;
-                m_SpeechBase.apiKey = API_KEY;
-                m_SpeechBase.secretKey = SECRET_KEY;
+                baiduSpeechJavaObject.Dispose();
+                baiduSpeechJavaObject = null;
             }
         }
 
-        //----------------------------------------语音识别----------------------------------------
-
-        /// <summary>初始化语音识别</summary>
-        public void SpeechInit()
+        /// <summary>设置百度语音的许可证</summary>
+        private void SetBaiduSpeechLicenese()
         {
-            if (m_SpeechBase != null) m_SpeechBase.SpeechInit();
+            if (m_Asr != null)
+            {
+                m_Asr.appId = APP_ID;
+                m_Asr.apiKey = API_KEY;
+                m_Asr.secretKey = SECRET_KEY;
+            }
+
+            if (m_Wakeup != null)
+            {
+                m_Wakeup.appId = APP_ID;
+                m_Wakeup.apiKey = API_KEY;
+                m_Wakeup.secretKey = SECRET_KEY;
+            }
+
+            if (m_Tts != null)
+            {
+                m_Tts.appId = APP_ID;
+                m_Tts.apiKey = API_KEY;
+                m_Tts.secretKey = SECRET_KEY;
+            }
+        }
+
+        //----------------------------------------语音转文本----------------------------------------
+
+        /// <summary>初始化语音转文本功能</summary>
+        public void AsrInit()
+        {
+            if (m_Asr != null) m_Asr.AsrInit();
         }
 
         /// <summary>开始录音</summary>
         public void VoiceStart(string json)
         {
-            if (m_SpeechBase != null) m_SpeechBase.VoiceStart(json);
+            if (m_Asr != null) m_Asr.VoiceStart(json);
         }
 
         /// <summary>取消本次识别，取消后将立即停止不会返回识别结果</summary>
         public void VoiceCancel()
         {
-            if (m_SpeechBase != null) m_SpeechBase.VoiceCancel();
+            if (m_Asr != null) m_Asr.VoiceCancel();
         }
 
         /// <summary>停止录音</summary>
         public void VoiceStop()
         {
-            if (m_SpeechBase != null) m_SpeechBase.VoiceStop();
+            if (m_Asr != null) m_Asr.VoiceStop();
         }
 
         /// <summary>释放语音识别算法</summary>
-        public void SpeechDispose()
+        public void AsrDispose()
         {
-            if (m_SpeechBase != null) m_SpeechBase.SpeechDispose();
+            if (m_Asr != null) m_Asr.OnDispose();
         }
 
         //----------------------------------------唤醒词----------------------------------------
@@ -79,25 +137,25 @@ namespace BaiduSpeech
         /// <summary>初始化唤醒词</summary>
         public void WakeupInit()
         {
-            if(m_SpeechBase != null) m_SpeechBase.WakeupInit();
+            if (m_Wakeup != null) m_Wakeup.WakeupInit();
         }
 
         /// <summary>开始唤醒词功能</summary>
         public void WakeupStart(string wakeUpPath)
         {
-            if (m_SpeechBase != null) m_SpeechBase.WakeupStart(wakeUpPath);
+            if (m_Wakeup != null) m_Wakeup.WakeupStart(wakeUpPath);
         }
 
         /// <summary>停止唤醒词</summary>
         public void WakeupStop()
         {
-            if (m_SpeechBase != null) m_SpeechBase.WakeupStop();
+            if (m_Wakeup != null) m_Wakeup.WakeupStop();
         }
 
         /// <summary>释放离线命令词算法</summary>
         public void WakeupDispose()
         {
-            if (m_SpeechBase != null) m_SpeechBase.WakeupDispose();
+            if (m_Wakeup != null) m_Wakeup.OnDispose();
         }
 
         //----------------------------------------事件回调----------------------------------------
@@ -105,7 +163,6 @@ namespace BaiduSpeech
         /// <summary>平台发送给Unity的消息</summary>
         public void OnMessage(string msg)
         {
-            Debug.Log("MSG:" + msg);
             try
             {
                 PlatformMessageInfo platformMessageInfo = JsonUtility.FromJson<PlatformMessageInfo>(msg);
@@ -113,7 +170,7 @@ namespace BaiduSpeech
             }
             catch (Exception e)
             {
-                Debug.LogError(GetType() + "/OnMessage()/接收到平台消息有误！msg:" + msg+ "---Exception:"+e);
+                Debug.LogError(GetType() + "/OnMessage()/接收到平台消息有误！msg:" + msg + "---Exception:" + e);
             }
         }
 
@@ -141,7 +198,7 @@ namespace BaiduSpeech
                 CallbackMessageInfo callbackMessage = JsonUtility.FromJson<CallbackMessageInfo>(data);
                 if (onSpeechEvent != null) onSpeechEvent(callbackMessage);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogWarning(GetType() + "/OnSpeechCallback()/解析数据失败！data:" + data + "---Exception:" + e);
             }

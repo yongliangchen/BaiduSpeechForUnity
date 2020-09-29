@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace BaiduSpeech.Examples
 {
+    /// <summary>唤醒功能测试</summary>
     public class WakeupDemo : MonoBehaviour
     {
         public Text content;
@@ -37,5 +38,6 @@ namespace BaiduSpeech.Examples
                 content.text = wakeupParams.word;
             }
         }
+
     }
 }
