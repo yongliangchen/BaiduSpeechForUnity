@@ -21,6 +21,9 @@ namespace BaiduSpeech.Examples
             m_BaiduSpeechManager = FindObjectOfType<BaiduSpeechManager>();
             m_BaiduSpeechManager.AsrInit();//初始化语音识别
             m_BaiduSpeechManager.onSpeechEvent += OnSpeechEvent;
+
+            m_BaiduSpeechManager.RequestPermissions(100, AndroidPermission.RECORD_AUDIO);
+            //Debug.Log("是否有录音权限："+m_BaiduSpeechManager.CheckPermissions(AndroidPermission.RECORD_AUDIO));
         }
 
         private void OnDestroy()

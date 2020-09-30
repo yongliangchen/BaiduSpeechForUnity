@@ -100,6 +100,32 @@ namespace BaiduSpeech
             }
         }
 
+        /// <summary>检查权限</summary>
+        public bool CheckPermissions(params string[] permissons)
+        {
+            bool havePermission = false;
+
+            if(baiduSpeechJavaObject!=null)
+            {
+                havePermission = baiduSpeechJavaObject.Call<bool>("CheckPermissions", permissons);
+            }
+
+            return havePermission;
+        }
+
+        /// <summary>
+        /// 请求权限
+        /// </summary>
+        /// <param name="requestCode">请求权限ID</param>
+        /// <param name="permissons">权限列表</param>
+        public void RequestPermissions(int requestCode, params string[] permissons)
+        {
+            if (baiduSpeechJavaObject != null)
+            {
+                baiduSpeechJavaObject.Call("RequestPermissions", requestCode, permissons);
+            }
+        }
+
         //----------------------------------------语音转文本----------------------------------------
 
         /// <summary>初始化语音转文本功能</summary>
@@ -163,6 +189,8 @@ namespace BaiduSpeech
         /// <summary>平台发送给Unity的消息</summary>
         public void OnMessage(string msg)
         {
+            Debug.Log("Msg:" + msg);
+
             try
             {
                 PlatformMessageInfo platformMessageInfo = JsonUtility.FromJson<PlatformMessageInfo>(msg);
