@@ -40,27 +40,5 @@ namespace BaiduSpeech
         /// <summary>释放算法</summary>
         public virtual void OnDispose() { }
 
-        //----------------------------------------语音识别----------------------------------------
-        ///// <summary>初始化语音</summary>
-        //public virtual void SpeechInit() { }
-        ///// <summary>开始录音</summary>
-        //public virtual void VoiceStart(string json) { }
-        ///// <summary>取消本次识别，取消后将立即停止不会返回识别结果</summary>
-        //public virtual void VoiceCancel() { }
-        ///// <summary>停止录音</summary>
-        //public virtual void VoiceStop() { }
-        ///// <summary>释放语音识别算法</summary>
-        //public virtual void SpeechDispose() { }
-
-        //----------------------------------------唤醒词----------------------------------------
-        ///// <summary>初始化唤醒词</summary>
-        //public virtual void WakeupInit() { }
-        ///// <summary>开始唤醒词功能</summary>
-        //public virtual void WakeupStart(string wakeUpPath) { }
-        ///// <summary>停止唤醒词</summary>
-        //public virtual void WakeupStop() { }
-        ///// <summary>释放唤醒词词算法</summary>
-        //public virtual void WakeupDispose() { }
-
     }
 }

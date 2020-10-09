@@ -3,7 +3,7 @@ using UnityEngine;
 namespace BaiduSpeech
 {
     [Serializable]
-    public class PlatformMessageInfo
+    public class PlatformMessageParams
     {
         /// <summary>消息ID</summary>
         public int msgCode;
@@ -15,7 +15,7 @@ namespace BaiduSpeech
 
     /// <summary>和原生交互的回调消息</summary>
     [Serializable]
-    public class CallbackMessageInfo
+    public class BaiduSpeechCallbackMessageParams
     {
         /// <summary>返回的状态</summary>
         public string state;
@@ -25,7 +25,7 @@ namespace BaiduSpeech
 
 
     [Serializable]
-    public class SpeechParams
+    public class AsrParams
     {
         /// <summary>解析后的识别结果。如无特殊情况，请取第一个结果</summary>
         public string[] results_recognition;
@@ -37,6 +37,16 @@ namespace BaiduSpeech
         public OriginResult origin_result;
         /// <summary>错误码</summary>
         public int error;
+    }
+
+    [Serializable]
+    public class WebAsrParams
+    {
+        public int err_no;
+        public string err_msg;
+        public long corpus_no;
+        public string sn;
+        public string[] result;
     }
 
     [Serializable]
@@ -59,7 +69,7 @@ namespace BaiduSpeech
         public long corpus_no;
         public int raf;
         /// <summary>返回结果</summary>
-        public Result result;
+        public Result result=new Result();
         public string sn;
     }
 
@@ -69,13 +79,6 @@ namespace BaiduSpeech
         /// <summary>文本</summary>
         public String[] word;
     }
-
-    //[Serializable]
-    //public class WakeupParams
-    //{
-    //    public string state;
-    //    public ParamsData paramsData;
-    //}
 
     [Serializable]
     public class ParamsData
@@ -88,12 +91,6 @@ namespace BaiduSpeech
         public string word;
     }
 
-    [Serializable]
-    public class AsrReady
-    {
-        public int pid;
-        public string sn;
-    }
 
     [Serializable]
     public class AsrVolume
@@ -106,10 +103,10 @@ namespace BaiduSpeech
 
     public class Serializable
     {
-        public static SpeechParams GetSpeechParams(string data)
+        public static AsrParams GetAsrParams(string data)
         {
-            SpeechParams speechParams = JsonUtility.FromJson<SpeechParams>(data);
-            return speechParams;
+            AsrParams asrParams = JsonUtility.FromJson<AsrParams>(data);
+            return asrParams;
         }
 
         public static AsrVolume GetAsrVolume(string data)

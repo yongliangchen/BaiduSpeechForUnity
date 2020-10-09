@@ -27,7 +27,7 @@ namespace BaiduSpeech.Examples
         }
 
         /// <summary>百度语音识别事件</summary>
-        private void OnSpeechEvent(CallbackMessageInfo callbackMessage)
+        private void OnSpeechEvent(BaiduSpeechCallbackMessageParams callbackMessage)
         {
             if (callbackMessage.state.Equals(SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS))
             {

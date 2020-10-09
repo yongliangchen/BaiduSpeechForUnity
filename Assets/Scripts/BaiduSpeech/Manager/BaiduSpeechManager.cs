@@ -10,8 +10,8 @@ namespace BaiduSpeech
         private const string API_KEY = "oihuTZ4kIwWctUmnnTIj39YA";
         private const string SECRET_KEY = "wMCLOlTWSrzPbHz9cyWEZnpTGfoV78Yd";
 
-        /// <summary>语音识别事件，参数1表示状态，参数2表示识别结果</summary>
-        public event Action<CallbackMessageInfo> onSpeechEvent = null;
+        /// <summary>语音识别事件</summary>
+        public event Action<BaiduSpeechCallbackMessageParams> onSpeechEvent = null;
         /// <summary>语音转文本</summary>
         private AsrBase m_Asr;
         /// <summary>唤醒词</summary>
@@ -193,8 +193,8 @@ namespace BaiduSpeech
 
             try
             {
-                PlatformMessageInfo platformMessageInfo = JsonUtility.FromJson<PlatformMessageInfo>(msg);
-                PlatformMessage(platformMessageInfo);
+                PlatformMessageParams platformMessageParams = JsonUtility.FromJson<PlatformMessageParams>(msg);
+                PlatformMessage(platformMessageParams);
             }
             catch (Exception e)
             {
@@ -203,16 +203,16 @@ namespace BaiduSpeech
         }
 
         //平台消息
-        private void PlatformMessage(PlatformMessageInfo platformMessageInfo)
+        private void PlatformMessage(PlatformMessageParams platformMessageParams)
         {
-            switch ((MessageCode)platformMessageInfo.msgCode)
+            switch ((MessageCode)platformMessageParams.msgCode)
             {
                 case MessageCode.None:
-                case MessageCode.Log: Debug.Log(GetType() + "/PlatformMessage()/" + platformMessageInfo.Content); break;
-                case MessageCode.Warning: Debug.LogWarning(GetType() + "/PlatformMessage()/" + platformMessageInfo.Content); break;
-                case MessageCode.Error: Debug.LogError(GetType() + "/PlatformMessage()/" + platformMessageInfo.Content); break;
-                case MessageCode.OnSpeechCallback: OnSpeechCallback(platformMessageInfo.Content); break;
-                case MessageCode.OnWakeupCallback: OnSpeechCallback(platformMessageInfo.Content); break;
+                case MessageCode.Log: Debug.Log(GetType() + "/PlatformMessage()/" + platformMessageParams.Content); break;
+                case MessageCode.Warning: Debug.LogWarning(GetType() + "/PlatformMessage()/" + platformMessageParams.Content); break;
+                case MessageCode.Error: Debug.LogError(GetType() + "/PlatformMessage()/" + platformMessageParams.Content); break;
+                case MessageCode.OnSpeechCallback: OnSpeechCallback(platformMessageParams.Content); break;
+                case MessageCode.OnWakeupCallback: OnSpeechCallback(platformMessageParams.Content); break;
                 default:
                     break;
             }
@@ -223,7 +223,7 @@ namespace BaiduSpeech
         {
             try
             {
-                CallbackMessageInfo callbackMessage = JsonUtility.FromJson<CallbackMessageInfo>(data);
+                BaiduSpeechCallbackMessageParams callbackMessage = JsonUtility.FromJson<BaiduSpeechCallbackMessageParams>(data);
                 if (onSpeechEvent != null) onSpeechEvent(callbackMessage);
             }
             catch (Exception e)
@@ -233,7 +233,7 @@ namespace BaiduSpeech
         }
 
         /// <summary>通过Web请求语音识别的回调</summary>
-        public void WebSpeechCallback(CallbackMessageInfo callbackMessage)
+        public void WebSpeechCallback(BaiduSpeechCallbackMessageParams callbackMessage)
         {
             if (onSpeechEvent != null && callbackMessage != null) onSpeechEvent(callbackMessage);
         }

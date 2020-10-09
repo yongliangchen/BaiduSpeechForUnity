@@ -49,20 +49,20 @@ namespace BaiduSpeech
         {
             if (isHaveMic == false || Microphone.IsRecording(currentDeviceName))
             {
-                CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+                BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
                 callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_ERROR;
-                SpeechParams speechParams = new SpeechParams();
-                speechParams.error = 1;
-                callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+                AsrParams asrParams = new AsrParams();
+                asrParams.error = 1;
+                callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
                 OnWebSpeechCallback(callbackMessage);
                 Debug.LogWarning(GetType() + "/SpeechInit()/当前设备没有麦克风！");
             }
             else
             {
-                CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+                BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
                 callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_READY;
-                SpeechParams speechParams = new SpeechParams();
-                callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+                AsrParams asrParams = new AsrParams();
+                callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
                 OnWebSpeechCallback(callbackMessage);
             }
         }
@@ -70,7 +70,7 @@ namespace BaiduSpeech
         /// <summary>
         /// 开始录音
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="json">详情请移步 https://ai.baidu.com/ai-doc/SPEECH/9k38lxfnk </param>
         public override void VoiceStart(string json)
         {
             if (isHaveMic == false || Microphone.IsRecording(currentDeviceName))
@@ -78,10 +78,10 @@ namespace BaiduSpeech
                 return;
             }
 
-            CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+            BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
             callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL;
-            SpeechParams speechParams = new SpeechParams();
-            callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+            AsrParams asrParams = new AsrParams();
+            callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
             OnWebSpeechCallback(callbackMessage);
 
             lastPressTimestamp = GetTimestampOfNowWithMillisecond();
@@ -96,10 +96,10 @@ namespace BaiduSpeech
                 return;
             }
 
-            CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+            BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
             callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_CANCEL;
-            SpeechParams speechParams = new SpeechParams();
-            callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+            AsrParams asrParams = new AsrParams();
+            callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
             OnWebSpeechCallback(callbackMessage);
 
             Microphone.End(currentDeviceName);
@@ -115,21 +115,21 @@ namespace BaiduSpeech
 
             if (trueLength > 1)
             {
-                CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+                BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
                 callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_EXIT;
-                SpeechParams speechParams = new SpeechParams();
-                callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+                AsrParams asrParams = new AsrParams();
+                callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
                 OnWebSpeechCallback(callbackMessage);
 
-                StartCoroutine(StartBaiduYuYin());
+                StartCoroutine(StartAsr());
             }
             else
             {
-                CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+                BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
                 callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_ERROR;
-                SpeechParams speechParams = new SpeechParams();
-                speechParams.error = 1;
-                callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+                AsrParams asrParams = new AsrParams();
+                asrParams.error = 1;
+                callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
                 OnWebSpeechCallback(callbackMessage);
                 Debug.LogWarning(GetType() + "/VoiceStop()/录音时长过短！");
             }
@@ -156,11 +156,11 @@ namespace BaiduSpeech
                 }
                 else
                 {
-                    CallbackMessageInfo callbackMessage = new CallbackMessageInfo();
+                    BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
                     callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_ERROR;
-                    SpeechParams speechParams = new SpeechParams();
-                    speechParams.error = 1;
-                    callbackMessage.paramsData = JsonUtility.ToJson(speechParams);
+                    AsrParams asrParams = new AsrParams();
+                    asrParams.error = 1;
+                    callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
                     OnWebSpeechCallback(callbackMessage);
                     Debug.LogWarning(GetType() + "/GetAccessToken()/验证错误,获取AccessToken失败！");
                 }
@@ -168,7 +168,7 @@ namespace BaiduSpeech
         }
 
         /// <summary>发起语音识别请求</summary>
-        private IEnumerator StartBaiduYuYin()
+        private IEnumerator StartAsr()
         {
             if (string.IsNullOrEmpty(accessToken)) { yield return GetAccessToken(); }
 
@@ -197,12 +197,38 @@ namespace BaiduSpeech
             if (string.IsNullOrEmpty(unityWebRequest.error))
             {
                 asrResult = unityWebRequest.downloadHandler.text;
+
                 Debug.Log(asrResult);
+
+                BaiduSpeechCallbackMessageParams callbackMessage = new BaiduSpeechCallbackMessageParams();
+
+                AsrParams asrParams = new AsrParams();
+
+                WebAsrParams webAsrParams = JsonUtility.FromJson<WebAsrParams>(asrResult);
+
+                OriginResult originResult = new OriginResult();
+                originResult.err_no = webAsrParams.err_no;
+                originResult.err_msg = webAsrParams.err_msg;
+                originResult.corpus_no = webAsrParams.corpus_no;
+                originResult.sn = webAsrParams.sn;
+                originResult.result.word = webAsrParams.result;
+
+                asrParams.origin_result = originResult;
+                asrParams.results_recognition = webAsrParams.result;
+
+                callbackMessage.state = SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL;
+                callbackMessage.paramsData = JsonUtility.ToJson(asrParams);
+
+                OnWebSpeechCallback(callbackMessage);
+            }
+            else
+            {
+                Debug.LogWarning(GetType() + "/StartAsr()/语音识别识别！");
             }
         }
 
         /// <summary>语音识别回调</summary>
-        private void OnWebSpeechCallback(CallbackMessageInfo callbackMessage)
+        private void OnWebSpeechCallback(BaiduSpeechCallbackMessageParams callbackMessage)
         {
             if (m_BaiduSpeechManager != null) m_BaiduSpeechManager.WebSpeechCallback(callbackMessage);
             else

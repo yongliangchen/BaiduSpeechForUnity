@@ -48,7 +48,7 @@ namespace BaiduSpeech.Examples
         }
 
         /// <summary>百度语音识别事件</summary>
-        private void OnSpeechEvent(CallbackMessageInfo callbackMessage)
+        private void OnSpeechEvent(BaiduSpeechCallbackMessageParams callbackMessage)
         {
             string state = callbackMessage.state;
             string paramsData = callbackMessage.paramsData;
@@ -67,19 +67,27 @@ namespace BaiduSpeech.Examples
 
                 Debug.Log("state:" + state + "---" + "params:" + paramsData);
 
-                SpeechParams speechParams = Serializable.GetSpeechParams(paramsData);
+                AsrParams asrParams = Serializable.GetAsrParams(paramsData);
 
-                if (speechParams.results_recognition.Length > 0) Debug.Log("results_recognition:" + speechParams.results_recognition[0]);
-                Debug.Log("result_type:" + speechParams.result_type);
-                Debug.Log("best_result:" + speechParams.best_result);
-                Debug.Log("corpus_no:" + speechParams.origin_result.corpus_no);
-                Debug.Log("err_no:" + speechParams.origin_result.err_no);
-                Debug.Log("raf:" + speechParams.origin_result.raf);
-                Debug.Log("sn:" + speechParams.origin_result.sn);
-                if(speechParams.origin_result.result.word.Length>0) Debug.Log("result:" + speechParams.origin_result.result.word[0]);
-                Debug.Log("error:" + speechParams.error);
+                if (asrParams.results_recognition.Length > 0) Debug.Log("results_recognition:" + asrParams.results_recognition[0]);
+                //Debug.Log("result_type:" + asrParams.result_type);
+                //Debug.Log("best_result:" + asrParams.best_result);
+                //Debug.Log("corpus_no:" + asrParams.origin_result.corpus_no);
+                //Debug.Log("err_no:" + asrParams.origin_result.err_no);
+                //Debug.Log("raf:" + asrParams.origin_result.raf);
+                //Debug.Log("sn:" + asrParams.origin_result.sn);
+                //if(asrParams.origin_result.result.word.Length>0) Debug.Log("result:" + asrParams.origin_result.result.word[0]);
+                //Debug.Log("error:" + asrParams.error);
 
-                if (speechParams.results_recognition.Length > 0) content.text = speechParams.results_recognition[0];
+                content.text = null;
+
+                if (asrParams.results_recognition.Length > 0)
+                {
+                    for(int i=0;i< asrParams.results_recognition.Length;i++)
+                    {
+                        content.text += asrParams.results_recognition[i];
+                    }
+                }
             }
 
             // 当前音量
