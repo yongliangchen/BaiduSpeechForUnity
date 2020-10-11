@@ -20,7 +20,7 @@ namespace BaiduSpeech.Examples
 
             m_BaiduSpeechManager = FindObjectOfType<BaiduSpeechManager>();
             m_BaiduSpeechManager.AsrInit();//初始化语音识别
-            m_BaiduSpeechManager.onSpeechEvent += OnSpeechEvent;
+            m_BaiduSpeechManager.onSpeechEventListener += OnSpeechEventListener;
 
             m_BaiduSpeechManager.RequestPermissions(100, AndroidPermission.RECORD_AUDIO);
             //Debug.Log("是否有录音权限："+m_BaiduSpeechManager.CheckPermissions(AndroidPermission.RECORD_AUDIO));
@@ -28,7 +28,7 @@ namespace BaiduSpeech.Examples
 
         private void OnDestroy()
         {
-            m_BaiduSpeechManager.onSpeechEvent -= OnSpeechEvent;
+            m_BaiduSpeechManager.onSpeechEventListener -= OnSpeechEventListener;
         }
 
         /// <summary>开始说话</summary>
@@ -48,10 +48,10 @@ namespace BaiduSpeech.Examples
         }
 
         /// <summary>百度语音识别事件</summary>
-        private void OnSpeechEvent(BaiduSpeechCallbackMessageParams callbackMessage)
+        private void OnSpeechEventListener(SpeechEventListenerInfo callbackMessage)
         {
             string state = callbackMessage.state;
-            string paramsData = callbackMessage.paramsData;
+            string param = callbackMessage.param;
 
             // 引擎就绪，可以说话，一般在收到此事件后通过UI通知用户可以说话了
             if (state.Equals(SpeechConstant.CALLBACK_EVENT_ASR_READY))
@@ -65,9 +65,9 @@ namespace BaiduSpeech.Examples
             {
                 stateText.text = "识别结果！";
 
-                Debug.Log("state:" + state + "---" + "params:" + paramsData);
+                Debug.Log("state:" + state + "---" + "params:" + param);
 
-                AsrParams asrParams = Serializable.GetAsrParams(paramsData);
+                AsrParams asrParams = Serializable.GetAsrParams(param);
 
                 if (asrParams.results_recognition.Length > 0) Debug.Log("results_recognition:" + asrParams.results_recognition[0]);
                 //Debug.Log("result_type:" + asrParams.result_type);
@@ -93,7 +93,7 @@ namespace BaiduSpeech.Examples
             // 当前音量
             if (state.Equals(SpeechConstant.CALLBACK_EVENT_ASR_VOLUME))
             {
-                AsrVolume asrVolume = Serializable.GetAsrVolume(paramsData);
+                AsrVolume asrVolume = Serializable.GetAsrVolume(param);
                 volumeSlider.value = asrVolume.volume_percent;
                 volumeText.text = asrVolume.volume_percent.ToString();
                 volumeText2.text = asrVolume.volume.ToString();
@@ -132,7 +132,7 @@ namespace BaiduSpeech.Examples
                 volumeText2.text = "0";
             }
 
-            //Debug.Log("state:"+ state+"---"+ "params:"+ paramsData);
+            //Debug.Log("state:"+ state+"---"+ "params:"+ param);
 
         }
     }

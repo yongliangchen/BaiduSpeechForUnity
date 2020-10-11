@@ -37,7 +37,7 @@ namespace BaiduSpeech
         public virtual void OnUpdate() { }
         /// <summary>初始化平台</summary>
         public virtual void OnInitPlatform() { }
-        /// <summary>释放算法</summary>
+        /// <summary>删除脚本</summary>
         public virtual void OnDispose() { }
 
     }

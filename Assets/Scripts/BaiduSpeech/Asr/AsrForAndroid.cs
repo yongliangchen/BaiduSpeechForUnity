@@ -25,7 +25,7 @@ namespace BaiduSpeech
         }
 
         /// <summary>初始化语音识别</summary>
-        public override void AsrInit()
+        public override void Init()
         {
             if (m_BaiduSpeechJavaObject != null)
             {
@@ -36,41 +36,66 @@ namespace BaiduSpeech
         }
 
         /// <summary>
-        /// 开始录音
+        /// 离线命令词，在线不需要调用
         /// </summary>
-        /// <param name="json"></param>
-        public override void VoiceStart(string json)
+        /// <param name="json">详情请移步 https://ai.baidu.com/ai-doc/SPEECH/9k38lxfnk </param>
+        public override void LoadOfflineEngine(string json)
         {
             if (m_AsrJavaObject != null)
             {
-                m_AsrJavaObject.CallStatic("VoiceStart", json);
+                m_AsrJavaObject.CallStatic("LoadOfflineEngine", json);
             }
-            else Debug.LogWarning(GetType() + "/VoiceStart()/ m_AsrJavaObject is null!");
+            else Debug.LogWarning(GetType() + "/LoadOfflineEngine()/ m_AsrJavaObject is null!");
+        }
+
+        /// <summary>
+        /// 开始录音
+        /// </summary>
+        /// <param name="json">详情请移步 https://ai.baidu.com/ai-doc/SPEECH/9k38lxfnk </param>
+        public override void Begin(string json)
+        {
+            if (m_AsrJavaObject != null)
+            {
+                m_AsrJavaObject.CallStatic("Start", json);
+            }
+            else Debug.LogWarning(GetType() + "/Begin()/ m_AsrJavaObject is null!");
         }
 
         /// <summary>取消本次识别，取消后将立即停止不会返回识别结果</summary>
-        public override void VoiceCancel()
+        public override void Cancel()
         {
             if (m_AsrJavaObject != null)
             {
-                m_AsrJavaObject.CallStatic("VoiceCancel");
+                m_AsrJavaObject.CallStatic("Cancel");
             }
-            else Debug.LogWarning(GetType() + "/VoiceCancel()/ m_AsrJavaObject is null!");
+            else Debug.LogWarning(GetType() + "/Cancel()/ m_AsrJavaObject is null!");
         }
 
         /// <summary>停止录音</summary>
-        public override void VoiceStop()
+        public override void Stop()
         {
             if (m_AsrJavaObject != null)
             {
-                m_AsrJavaObject.CallStatic("VoiceStop");
+                m_AsrJavaObject.CallStatic("Stop");
             }
-            else Debug.LogWarning(GetType() + "/VoiceStop()/ m_AsrJavaObject is null!");
+            else Debug.LogWarning(GetType() + "/Stop()/ m_AsrJavaObject is null!");
+        }
+
+        /// <summary>释放算法</summary>
+        public override void Release()
+        {
+            if (m_AsrJavaObject != null)
+            {
+                m_AsrJavaObject.CallStatic("Release");
+            }
+            else Debug.LogWarning(GetType() + "/Release()/ m_AsrJavaObject is null!");
         }
 
         /// <summary>释放语音识别算法</summary>
         public override void OnDispose()
         {
+            Release();
+
             if (m_AsrJavaObject != null) m_AsrJavaObject.Dispose();
             m_AsrJavaObject = null;
         }

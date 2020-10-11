@@ -9,6 +9,6 @@
         Error,//发生错误
         onRequestPermissionsResult,//请求权限回调结果
         OnWakeupCallback,//唤醒词回调
-        OnSpeechCallback,//语音识别回调
+        OnAsrCallback,//语音识别回调
     }
 }

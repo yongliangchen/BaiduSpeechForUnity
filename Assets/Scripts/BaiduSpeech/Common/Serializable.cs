@@ -10,17 +10,23 @@ namespace BaiduSpeech
         /// <summary>消息体</summary>
         public string Content;
         /// <summary>消息体集合</summary>
-        public string ContentArr;
+        //public string ContentArr;
     }
 
     /// <summary>和原生交互的回调消息</summary>
     [Serializable]
-    public class BaiduSpeechCallbackMessageParams
+    public class SpeechEventListenerInfo
     {
         /// <summary>返回的状态</summary>
         public string state;
         /// <summary>参数数据</summary>
-        public string paramsData;
+        public string param;
+        /// <summary>缓存临时数据</summary>
+        public byte[] data;
+        /// <summary>缓存临时数据开始索引</summary>
+        public int offset;
+        /// <summary>缓存临时数据开始长度</summary>
+        public int length;
     }
 
 
@@ -101,6 +107,14 @@ namespace BaiduSpeech
         public int volume_percent;
     }
 
+    [Serializable]
+    public class PermissionsResultInfo
+    {
+        public int requestCode;
+        public string[] permissions;
+        public int[] grantResults;
+    }
+
     public class Serializable
     {
         public static AsrParams GetAsrParams(string data)
@@ -121,6 +135,4 @@ namespace BaiduSpeech
             return wakeupParams;
         }
     }
-
-  
 }

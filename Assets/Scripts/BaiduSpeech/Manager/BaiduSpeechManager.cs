@@ -11,13 +11,14 @@ namespace BaiduSpeech
         private const string SECRET_KEY = "wMCLOlTWSrzPbHz9cyWEZnpTGfoV78Yd";
 
         /// <summary>语音识别事件</summary>
-        public event Action<BaiduSpeechCallbackMessageParams> onSpeechEvent = null;
+        public event Action<SpeechEventListenerInfo> onSpeechEventListener = null;
+        /// <summary>权限请求回调</summary>
+        public event Action<PermissionsResultInfo> onRequestPermissionsResult = null;
+
         /// <summary>语音转文本</summary>
         private AsrBase m_Asr;
         /// <summary>唤醒词</summary>
         private WakeupBase m_Wakeup;
-        /// <summary>文本转语音</summary>
-        private TtsBase m_Tts;
 
         /// <summary>百度语音管理Java类</summary>
         public AndroidJavaObject baiduSpeechJavaObject { get; set; }
@@ -40,22 +41,16 @@ namespace BaiduSpeech
 
             m_Asr = gameObject.AddComponent<AsrForAndroid>();
             m_Wakeup = gameObject.AddComponent<WakeupForAndroid>();
-            m_Tts = gameObject.AddComponent<TtsForAndroid>();
-
 #else
 
 #if UNITY_IPHONE && !UNITY_EDITOR
 
             m_Asr = gameObject.AddComponent<AsrForiOS>();
-            m_Wakeup = gameObject.AddComponent<WakeupForiOS>();
-            m_Tts = gameObject.AddComponent<TtsForiOS>();
-
+            m_Wakeup = gameObject.AddComponent<WakeupForiOS>(); 
 #else
 
             m_Asr = gameObject.AddComponent<AsrForWeb>();
             m_Wakeup = gameObject.AddComponent<WakeupForWeb>();
-            m_Tts = gameObject.AddComponent<TtsForWeb>();
-
 #endif
 #endif
 
@@ -64,10 +59,6 @@ namespace BaiduSpeech
 
         private void OnDestroy()
         {
-            if (m_Asr != null) m_Asr.OnDispose();
-            if (m_Wakeup != null) m_Wakeup.OnDispose();
-            if (m_Tts != null) m_Tts.OnDispose();
-
             if (baiduSpeechJavaObject != null)
             {
                 baiduSpeechJavaObject.Dispose();
@@ -91,26 +82,19 @@ namespace BaiduSpeech
                 m_Wakeup.apiKey = API_KEY;
                 m_Wakeup.secretKey = SECRET_KEY;
             }
-
-            if (m_Tts != null)
-            {
-                m_Tts.appId = APP_ID;
-                m_Tts.apiKey = API_KEY;
-                m_Tts.secretKey = SECRET_KEY;
-            }
         }
 
         /// <summary>检查权限</summary>
-        public bool CheckPermissions(params string[] permissons)
+        public bool CheckPermission(string permisson)
         {
-            bool havePermission = false;
+            int havePermission = 1;
 
-            if(baiduSpeechJavaObject!=null)
+            if (baiduSpeechJavaObject != null)
             {
-                havePermission = baiduSpeechJavaObject.Call<bool>("CheckPermissions", permissons);
+                havePermission = baiduSpeechJavaObject.Call<int>("CheckPermissions", permisson);
             }
 
-            return havePermission;
+            return havePermission == 0;
         }
 
         /// <summary>
@@ -131,31 +115,43 @@ namespace BaiduSpeech
         /// <summary>初始化语音转文本功能</summary>
         public void AsrInit()
         {
-            if (m_Asr != null) m_Asr.AsrInit();
+            if (m_Asr != null) m_Asr.Init();
         }
 
-        /// <summary>开始录音</summary>
+        /// <summary>
+        ///  离线命令词，在线不需要调用(只支持Android和iOS设备)
+        /// </summary>
+        /// <param name="json">详情请移步 https://ai.baidu.com/ai-doc/SPEECH/9k38lxfnk </param>
+        public void VoiceLoadOfflineEngine(string json)
+        {
+            if (m_Asr != null) m_Asr.LoadOfflineEngine(json);
+        }
+
+        /// <summary>
+        /// 开始录音
+        /// </summary>
+        /// <param name="json">详情请移步 https://ai.baidu.com/ai-doc/SPEECH/9k38lxfnk </param>
         public void VoiceStart(string json)
         {
-            if (m_Asr != null) m_Asr.VoiceStart(json);
+            if (m_Asr != null) m_Asr.Begin(json);
         }
 
         /// <summary>取消本次识别，取消后将立即停止不会返回识别结果</summary>
         public void VoiceCancel()
         {
-            if (m_Asr != null) m_Asr.VoiceCancel();
+            if (m_Asr != null) m_Asr.Cancel();
         }
 
         /// <summary>停止录音</summary>
         public void VoiceStop()
         {
-            if (m_Asr != null) m_Asr.VoiceStop();
+            if (m_Asr != null) m_Asr.Stop();
         }
 
-        /// <summary>释放语音识别算法</summary>
-        public void AsrDispose()
+        /// <summary>释放算法</summary>
+        public void VoiceRelease()
         {
-            if (m_Asr != null) m_Asr.OnDispose();
+            if (m_Asr != null) m_Asr.Release();
         }
 
         //----------------------------------------唤醒词----------------------------------------
@@ -163,25 +159,25 @@ namespace BaiduSpeech
         /// <summary>初始化唤醒词</summary>
         public void WakeupInit()
         {
-            if (m_Wakeup != null) m_Wakeup.WakeupInit();
+            if (m_Wakeup != null) m_Wakeup.Init();
         }
 
         /// <summary>开始唤醒词功能</summary>
         public void WakeupStart(string wakeUpPath)
         {
-            if (m_Wakeup != null) m_Wakeup.WakeupStart(wakeUpPath);
+            if (m_Wakeup != null) m_Wakeup.Begin(wakeUpPath);
         }
 
         /// <summary>停止唤醒词</summary>
         public void WakeupStop()
         {
-            if (m_Wakeup != null) m_Wakeup.WakeupStop();
+            if (m_Wakeup != null) m_Wakeup.Stop();
         }
 
-        /// <summary>释放离线命令词算法</summary>
-        public void WakeupDispose()
+        /// <summary>释放算法</summary>
+        public void WakeupRelease()
         {
-            if (m_Wakeup != null) m_Wakeup.OnDispose();
+            if (m_Wakeup != null) m_Wakeup.Release();
         }
 
         //----------------------------------------事件回调----------------------------------------
@@ -211,32 +207,46 @@ namespace BaiduSpeech
                 case MessageCode.Log: Debug.Log(GetType() + "/PlatformMessage()/" + platformMessageParams.Content); break;
                 case MessageCode.Warning: Debug.LogWarning(GetType() + "/PlatformMessage()/" + platformMessageParams.Content); break;
                 case MessageCode.Error: Debug.LogError(GetType() + "/PlatformMessage()/" + platformMessageParams.Content); break;
-                case MessageCode.OnSpeechCallback: OnSpeechCallback(platformMessageParams.Content); break;
+                case MessageCode.OnAsrCallback: OnSpeechCallback(platformMessageParams.Content); break;
                 case MessageCode.OnWakeupCallback: OnSpeechCallback(platformMessageParams.Content); break;
+                case MessageCode.onRequestPermissionsResult:OnRequestPermissionsResult(platformMessageParams.Content);break;
                 default:
                     break;
             }
         }
 
         /// <summary>语音识别回调</summary>
-        private void OnSpeechCallback(string data)
+        private void OnSpeechCallback(string json)
         {
             try
             {
-                BaiduSpeechCallbackMessageParams callbackMessage = JsonUtility.FromJson<BaiduSpeechCallbackMessageParams>(data);
-                if (onSpeechEvent != null) onSpeechEvent(callbackMessage);
+                SpeechEventListenerInfo callbackMessage = JsonUtility.FromJson<SpeechEventListenerInfo>(json);
+                if (onSpeechEventListener != null) onSpeechEventListener(callbackMessage);
             }
             catch (Exception e)
             {
-                Debug.LogWarning(GetType() + "/OnSpeechCallback()/解析数据失败！data:" + data + "---Exception:" + e);
+                Debug.LogWarning(GetType() + "/OnSpeechCallback()/解析数据失败！data:" + json + "---Exception:" + e);
             }
         }
 
         /// <summary>通过Web请求语音识别的回调</summary>
-        public void WebSpeechCallback(BaiduSpeechCallbackMessageParams callbackMessage)
+        public void WebSpeechCallback(SpeechEventListenerInfo callbackMessage)
         {
-            if (onSpeechEvent != null && callbackMessage != null) onSpeechEvent(callbackMessage);
+            if (onSpeechEventListener != null && callbackMessage != null) onSpeechEventListener(callbackMessage);
         }
 
+        /// <summary>权限请求回调</summary>
+        private void OnRequestPermissionsResult(string json)
+        {
+            try
+            {
+                PermissionsResultInfo permissionsResultInfo = JsonUtility.FromJson<PermissionsResultInfo>(json);
+                if (onRequestPermissionsResult != null) onRequestPermissionsResult(permissionsResultInfo);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(GetType() + "/OnRequestPermissionsResult()/解析数据失败！data:" + json + "---Exception:" + e);
+            }
+        }
     }
 }
